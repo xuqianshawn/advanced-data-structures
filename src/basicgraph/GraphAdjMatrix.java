@@ -2,6 +2,7 @@ package basicgraph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +106,14 @@ public class GraphAdjMatrix extends Graph {
 	 */	
 	public List<Integer> getDistance2(int v) {
 		// XXX Implement this method in week 2
-		return null;
+		//canReach collection can have duplicates, otherwise it is a set
+		 List<Integer> firstNeighbours=getNeighbors(v);
+		 List<Integer> twoHopsNeighbours=new ArrayList<Integer>();
+		 for(int i:firstNeighbours)
+		 {			 
+			 twoHopsNeighbours.addAll(getNeighbors(i));
+		 }
+		 return twoHopsNeighbours;
 	}
 	
 	/**
