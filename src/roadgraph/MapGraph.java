@@ -168,7 +168,7 @@ public class MapGraph {
 			GeographicPoint currentNode = queue.poll();
 			nodeSearched.accept(currentNode);
 			if (currentNode.equals(goal)) {
-				break;
+				return reconstructPath(start, goal, parentMap);
 			}
 			if (!visited.contains(currentNode)) {
 				visited.add(currentNode);
@@ -178,6 +178,11 @@ public class MapGraph {
 					if (!visited.contains(next)) {
 						queue.offer(next);
 						parentMap.put(next, currentNode);
+						if (next.equals(goal)) {
+							// already find the target, break since no need to
+							// look further
+							return reconstructPath(start, goal, parentMap);
+						}
 					}
 				}
 			}
