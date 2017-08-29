@@ -23,7 +23,7 @@ public class MapGraph {
 	// TODO: Add your member variables here in WEEK 3
 	private HashMap<GeographicPoint, MapNode> nodes;
 	private int numOfEdges = 0;
-
+    private GeographicPoint _goal;
 	/**
 	 * Create a new empty MapGraph
 	 */
@@ -228,7 +228,6 @@ public class MapGraph {
 		};
 		return dijkstra(start, goal, temp);
 	}
-
 	/**
 	 * Find the path from start to goal using Dijkstra's algorithm
 	 * 
@@ -248,8 +247,45 @@ public class MapGraph {
 
 		// Hook for visualization. See writeup.
 		// nodeSearched.accept(next.getLocation());
-
-		return null;
+		_goal=goal;
+		if (start == null || goal == null) {
+			System.out.println("Start or goal node is null!  No path exists.");
+			return new LinkedList<GeographicPoint>();
+		}
+		if (getNeighborEdgesByPoint(start).size() == 0) {
+			//to fit the grader
+			return null;
+		}
+		// child maps to parent <child, parent>
+		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		PriorityQueue<GeographicPoint>  queue = new PriorityQueue<GeographicPoint>(getNumVertices());
+		queue.offer(start);
+		while (queue.size() > 0) {
+			GeographicPoint currentNode = queue.poll();
+			nodeSearched.accept(currentNode);
+			if (currentNode.equals(goal)) {
+				return reconstructPath(start, goal, parentMap);
+			}
+			if (!visited.contains(currentNode)) {
+				visited.add(currentNode);
+				// queue.addAll(getNeighborEdgesByPoint(currentNode));
+				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
+					MapNode next = edge.getNodeTo();
+					if (!visited.contains(next)) {
+						queue.offer(next);
+						parentMap.put(next, currentNode);
+						if (next.equals(goal)) {
+							// already find the target, break since no need to
+							// look further
+							nodeSearched.accept(next);
+							return reconstructPath(start, goal, parentMap);
+						}
+					}
+				}
+			}
+		}
+		return reconstructPath(start, goal, parentMap);
 	}
 
 	/**

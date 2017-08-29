@@ -2,7 +2,7 @@ package roadgraph;
 import java.util.*;
 
 import geography.GeographicPoint;
-public class MapNode extends GeographicPoint {
+public class MapNode extends GeographicPoint implements Comparable<MapNode> {
 	/**
 	 * 
 	 */
@@ -16,6 +16,10 @@ public class MapNode extends GeographicPoint {
     {
     	return edges.size();
     }
+    public double getDistanceFromGoal(double latGoal, double longGoal)
+    {
+    	return Math.sqrt((this.getX()-latGoal)*(this.getX()-latGoal)+(this.getY()-longGoal)*(this.getY()-longGoal));
+    }
     public ArrayList<MapEdge> getEdges()
     {
     	return edges;
@@ -24,6 +28,11 @@ public class MapNode extends GeographicPoint {
 		// TODO Auto-generated method stub
 		MapEdge edge=new MapEdge(mapNodeFrom,mapNodeTo,roadName,roadType,length);
 		edges.add(edge);
+	}
+	@Override
+	public int compareTo(MapNode o) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 }
