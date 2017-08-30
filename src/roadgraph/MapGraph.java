@@ -23,7 +23,8 @@ public class MapGraph {
 	// TODO: Add your member variables here in WEEK 3
 	private HashMap<GeographicPoint, MapNode> nodes;
 	private int numOfEdges = 0;
-    private GeographicPoint _goal;
+	private GeographicPoint _goal;
+
 	/**
 	 * Create a new empty MapGraph
 	 */
@@ -224,6 +225,20 @@ public class MapGraph {
 		};
 		return dijkstra(start, goal, temp);
 	}
+
+	public class distanceComparator implements Comparator<MapNode> {
+		@Override
+		public int compare(MapNode x, MapNode y) {
+			if (x.getDistanceFromStart() < y.getDistanceFromStart()) {
+				return -1;
+			}
+			if (x.getDistanceFromStart() > y.getDistanceFromStart()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
+
 	/**
 	 * Find the path from start to goal using Dijkstra's algorithm
 	 * 
@@ -240,16 +255,19 @@ public class MapGraph {
 	public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal,
 			Consumer<GeographicPoint> nodeSearched) {
 		// TODO: Implement this method in WEEK 4
-		_goal=goal;
+		_goal = goal;
 		if (start == null || goal == null) {
 			System.out.println("Start or goal node is null!  No path exists.");
 			return new LinkedList<GeographicPoint>();
 		}
+		// initilize starting point 0
+		((MapNode) nodes.get(start)).setDistanceFromStart(0);
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();
-		PriorityQueue<GeographicPoint>  queue = new PriorityQueue<GeographicPoint>(getNumVertices());
-		queue.offer(start);
+		distanceComparator comparator = new distanceComparator();
+		PriorityQueue<MapNode> queue = new PriorityQueue<MapNode>(comparator);
+		queue.offer(nodes.get(start));
 		while (queue.size() > 0) {
 			GeographicPoint currentNode = queue.poll();
 			nodeSearched.accept(currentNode);
@@ -261,8 +279,13 @@ public class MapGraph {
 				// queue.addAll(getNeighborEdgesByPoint(currentNode));
 				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
 					MapNode next = edge.getNodeTo();
+					// update distance of next
+					double newDistance = ((MapNode) currentNode).getDistanceFromStart() + edge.getLength();
+					if (newDistance < next.getDistanceFromStart()) {
+						next.setDistanceFromStart(newDistance);
+					}
 					if (!visited.contains(next)) {
-						queue.offer(next);
+						queue.add(next);
 						parentMap.put(next, currentNode);
 						if (next.equals(goal)) {
 							// already find the target, break since no need to
