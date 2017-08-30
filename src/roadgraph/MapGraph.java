@@ -157,10 +157,6 @@ public class MapGraph {
 			System.out.println("Start or goal node is null!  No path exists.");
 			return new LinkedList<GeographicPoint>();
 		}
-		if (getNeighborEdgesByPoint(start).size() == 0) {
-			//to fit the grader
-			return null;
-		}
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();
@@ -190,7 +186,7 @@ public class MapGraph {
 				}
 			}
 		}
-		return reconstructPath(start, goal, parentMap);
+		return null;
 	}
 
 	private List<MapEdge> getNeighborEdgesByPoint(GeographicPoint point) {
@@ -244,17 +240,10 @@ public class MapGraph {
 	public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal,
 			Consumer<GeographicPoint> nodeSearched) {
 		// TODO: Implement this method in WEEK 4
-
-		// Hook for visualization. See writeup.
-		// nodeSearched.accept(next.getLocation());
 		_goal=goal;
 		if (start == null || goal == null) {
 			System.out.println("Start or goal node is null!  No path exists.");
 			return new LinkedList<GeographicPoint>();
-		}
-		if (getNeighborEdgesByPoint(start).size() == 0) {
-			//to fit the grader
-			return null;
 		}
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
@@ -285,7 +274,7 @@ public class MapGraph {
 				}
 			}
 		}
-		return reconstructPath(start, goal, parentMap);
+		return null;
 	}
 
 	/**
