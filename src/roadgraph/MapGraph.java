@@ -241,10 +241,10 @@ public class MapGraph {
 	public class distanceFromGoalComparator implements Comparator<MapNode> {
 		@Override
 		public int compare(MapNode x, MapNode y) {
-			if (x.getDistanceFromGoal() < y.getDistanceFromGoal()) {
+			if (x.getDistanceFromGoal()+x.getDistanceFromStart() < y.getDistanceFromGoal()+y.getDistanceFromStart()) {
 				return -1;
 			}
-			if (x.getDistanceFromGoal() > y.getDistanceFromGoal()) {
+			if (x.getDistanceFromGoal()+x.getDistanceFromStart() > y.getDistanceFromGoal()+y.getDistanceFromStart()) {
 				return 1;
 			}
 			return 0;
@@ -349,6 +349,8 @@ public class MapGraph {
 		}
 		
 		((MapNode) nodes.get(start)).setDistanceFromGoal(start.distance(goal));
+		((MapNode) nodes.get(start)).setDistanceFromStart(0);
+		
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
@@ -364,17 +366,20 @@ public class MapGraph {
 			}
 			if (!visited.contains(currentNode)) {
 				visited.add(currentNode);
-				System.out.println(currentNode.x + " " + currentNode.y+" distance from goal is "+currentNode.getDistanceFromGoal());
+				//System.out.println(currentNode.x + " " + currentNode.y+" distance from goal is "+currentNode.getDistanceFromGoal());
 				// queue.addAll(getNeighborEdgesByPoint(currentNode));
 				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
 					MapNode next = edge.getNodeTo();
 					// update distance of next
-
-					next.setDistanceFromGoal(next.distance(goal));					
+					double newDistance = ((MapNode) currentNode).getDistanceFromStart() + edge.getLength();
+					if (newDistance < next.getDistanceFromStart()) {
+					next.setDistanceFromGoal(next.distance(goal));	
+					next.setDistanceFromStart(newDistance);
 						if (!visited.contains(next)) {
 							queue.add(next);
 							parentMap.put(next, currentNode);
-						}				
+						}	
+					}
 				}
 			}
 		}
