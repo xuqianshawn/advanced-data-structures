@@ -225,13 +225,26 @@ public class MapGraph {
 		return dijkstra(start, goal, temp);
 	}
 
-	public class distanceComparator implements Comparator<MapNode> {
+	public class distanceFromStartComparator implements Comparator<MapNode> {
 		@Override
 		public int compare(MapNode x, MapNode y) {
 			if (x.getDistanceFromStart() < y.getDistanceFromStart()) {
 				return -1;
 			}
 			if (x.getDistanceFromStart() > y.getDistanceFromStart()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
+
+	public class distanceFromGoalComparator implements Comparator<MapNode> {
+		@Override
+		public int compare(MapNode x, MapNode y) {
+			if (x.getDistanceFromGoal() < y.getDistanceFromGoal()) {
+				return -1;
+			}
+			if (x.getDistanceFromGoal() > y.getDistanceFromGoal()) {
 				return 1;
 			}
 			return 0;
@@ -263,26 +276,27 @@ public class MapGraph {
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
-		distanceComparator comparator = new distanceComparator();
+		distanceFromStartComparator comparator = new distanceFromStartComparator();
 		PriorityQueue<MapNode> queue = new PriorityQueue<MapNode>(comparator);
 		queue.offer(nodes.get(start));
 		while (queue.size() > 0) {
 			MapNode currentNode = queue.poll();
 			nodeSearched.accept(currentNode);
 			if (nodes.get(currentNode).equals(goal)) {
-				//System.out.println("goal find " + currentNode.getDistanceFromStart());
+				// System.out.println("goal find " +
+				// currentNode.getDistanceFromStart());
 				return reconstructPath(nodes.get(start), nodes.get(goal), parentMap);
 			}
 			if (!visited.contains(currentNode)) {
 				visited.add(currentNode);
-				//System.out.println(currentNode.x + " " + currentNode.y);
+				// System.out.println(currentNode.x + " " + currentNode.y);
 				// queue.addAll(getNeighborEdgesByPoint(currentNode));
 				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
 					MapNode next = edge.getNodeTo();
 					// update distance of next
 
 					double newDistance = ((MapNode) currentNode).getDistanceFromStart() + edge.getLength();
-					//always looking for shortest path
+					// always looking for shortest path
 					if (newDistance < next.getDistanceFromStart()) {
 						next.setDistanceFromStart(newDistance);
 						if (!visited.contains(next)) {
@@ -329,10 +343,41 @@ public class MapGraph {
 	public List<GeographicPoint> aStarSearch(GeographicPoint start, GeographicPoint goal,
 			Consumer<GeographicPoint> nodeSearched) {
 		// TODO: Implement this method in WEEK 4
+		if (start == null || goal == null) {
+			System.out.println("Start or goal node is null!  No path exists.");
+			return new LinkedList<GeographicPoint>();
+		}
+		
+		((MapNode) nodes.get(start)).setDistanceFromGoal(start.distance(goal));
+		// child maps to parent <child, parent>
+		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		distanceFromGoalComparator comparator = new distanceFromGoalComparator();
+		PriorityQueue<MapNode> queue = new PriorityQueue<MapNode>(comparator);
+		queue.offer(nodes.get(start));
+		while (queue.size() > 0) {
+			MapNode currentNode = queue.poll();
+			nodeSearched.accept(currentNode);
+			if (nodes.get(currentNode).equals(goal)) {
+				//System.out.println("goal find " + currentNode.getDistanceFromStart());
+				return reconstructPath(nodes.get(start), nodes.get(goal), parentMap);
+			}
+			if (!visited.contains(currentNode)) {
+				visited.add(currentNode);
+				System.out.println(currentNode.x + " " + currentNode.y+" distance from goal is "+currentNode.getDistanceFromGoal());
+				// queue.addAll(getNeighborEdgesByPoint(currentNode));
+				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
+					MapNode next = edge.getNodeTo();
+					// update distance of next
 
-		// Hook for visualization. See writeup.
-		// nodeSearched.accept(next.getLocation());
-
+					next.setDistanceFromGoal(next.distance(goal));					
+						if (!visited.contains(next)) {
+							queue.add(next);
+							parentMap.put(next, currentNode);
+						}				
+				}
+			}
+		}
 		return null;
 	}
 
@@ -349,12 +394,13 @@ public class MapGraph {
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
-		System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
+		System.out.println("start aStar search");
 		// List<GeographicPoint> testroute0 = simpleTestMap.bfs(testStart,
 		// testEnd);
 		// System.out.println(testroute0);
-		List<GeographicPoint> testroute1 = simpleTestMap.dijkstra(testStart, testEnd);
-		System.out.println(testroute1);
+		// List<GeographicPoint> testroute1 = simpleTestMap.dijkstra(testStart,
+		// testEnd);
+		// System.out.println(testroute1);
 		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart, testEnd);
 		System.out.println(testroute2);
 

@@ -8,9 +8,10 @@ public class MapNode extends GeographicPoint implements Comparable<MapNode> {
 	 */
 	private static final long serialVersionUID = 1L;
 	private ArrayList<MapEdge> edges = new ArrayList<MapEdge>();
-	public double distanceFromGoalEstimated;
+	//default value for aStar algorithm
+	private double distanceFromGoalEstimated=Integer.MAX_VALUE;
 	//default value for dijkstra algorithm
-	public double distanceFromStart=Integer.MAX_VALUE;
+	private double distanceFromStart=Integer.MAX_VALUE;
 	public MapNode(double latitude, double longitude) {
 		super(latitude, longitude);
 		// TODO Auto-generated constructor stub
