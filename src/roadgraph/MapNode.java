@@ -12,6 +12,11 @@ public class MapNode extends GeographicPoint implements Comparable<MapNode> {
 	private double distanceFromGoalEstimated=Integer.MAX_VALUE;
 	//default value for dijkstra algorithm
 	private double distanceFromStart=Integer.MAX_VALUE;
+	
+	//for extension of max speed of edge
+	private double travelTimeFromGoalEstimated=Integer.MAX_VALUE;
+	//for extension of max speed of edge
+	private double travelTimeFromStart=Integer.MAX_VALUE;
 	public MapNode(double latitude, double longitude) {
 		super(latitude, longitude);
 		// TODO Auto-generated constructor stub
@@ -33,6 +38,24 @@ public class MapNode extends GeographicPoint implements Comparable<MapNode> {
     {
     	return distanceFromStart;
     	//return Math.sqrt((this.getX()-latGoal)*(this.getX()-latGoal)+(this.getY()-longGoal)*(this.getY()-longGoal));
+    }
+    public void setTravelTimeFromGoalEstimated(double val)
+    {
+    	travelTimeFromGoalEstimated=val;
+    }
+    public double getTravelTimeFromGoalEstimated()
+    {
+    	return travelTimeFromGoalEstimated;
+    	
+    }
+    public void setTravelTimeFromStart(double val)
+    {
+    	distanceFromStart=val;
+    }
+    public double getTravelTimeFromStart()
+    {
+    	return distanceFromStart;
+    	
     }
     public void setDistanceFromStart(double dist)
     {

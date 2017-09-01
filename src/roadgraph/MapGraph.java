@@ -237,7 +237,30 @@ public class MapGraph {
 			return 0;
 		}
 	}
-
+	public class travelTimeFromStartComparator implements Comparator<MapNode> {
+		@Override
+		public int compare(MapNode x, MapNode y) {
+			if (x.getTravelTimeFromStart() < y.getTravelTimeFromStart()) {
+				return -1;
+			}
+			if (x.getTravelTimeFromStart() > y.getTravelTimeFromStart()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
+	public class travelTimeFromGoalComparator implements Comparator<MapNode> {
+		@Override
+		public int compare(MapNode x, MapNode y) {
+			if (x.getTravelTimeFromStart()+x.getTravelTimeFromGoalEstimated() < y.getTravelTimeFromStart()+y.getTravelTimeFromGoalEstimated()) {
+				return -1;
+			}
+			if (x.getTravelTimeFromStart()+x.getTravelTimeFromGoalEstimated() > y.getTravelTimeFromStart()+y.getTravelTimeFromGoalEstimated()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
 	public class distanceFromGoalComparator implements Comparator<MapNode> {
 		@Override
 		public int compare(MapNode x, MapNode y) {
@@ -273,10 +296,11 @@ public class MapGraph {
 		}
 		// initilize starting point 0
 		((MapNode) nodes.get(start)).setDistanceFromStart(0);
+		((MapNode) nodes.get(start)).setTravelTimeFromStart(0);
 		// child maps to parent <child, parent>
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
-		distanceFromStartComparator comparator = new distanceFromStartComparator();
+		travelTimeFromStartComparator comparator = new travelTimeFromStartComparator();
 		PriorityQueue<MapNode> queue = new PriorityQueue<MapNode>(comparator);
 		queue.offer(nodes.get(start));
 		while (queue.size() > 0) {
@@ -289,16 +313,16 @@ public class MapGraph {
 			}
 			if (!visited.contains(currentNode)) {
 				visited.add(currentNode);
-				// System.out.println(currentNode.x + " " + currentNode.y);
+				 System.out.println(currentNode.x + " " + currentNode.y);
 				// queue.addAll(getNeighborEdgesByPoint(currentNode));
 				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
 					MapNode next = edge.getNodeTo();
 					// update distance of next
 
-					double newDistance = ((MapNode) currentNode).getDistanceFromStart() + edge.getLength();
+					double travelTime = ((MapNode) currentNode).getTravelTimeFromStart() + edge.getLength()/edge.getMaxSpeed();
 					// always looking for shortest path
-					if (newDistance < next.getDistanceFromStart()) {
-						next.setDistanceFromStart(newDistance);
+					if (travelTime < next.getTravelTimeFromStart()) {
+						next.setTravelTimeFromStart(travelTime);
 						if (!visited.contains(next)) {
 							queue.add(next);
 							parentMap.put(next, currentNode);
@@ -366,7 +390,7 @@ public class MapGraph {
 			}
 			if (!visited.contains(currentNode)) {
 				visited.add(currentNode);
-				//System.out.println(currentNode.x + " " + currentNode.y+" distance from goal is "+currentNode.getDistanceFromGoal());
+				System.out.println(currentNode.x + " " + currentNode.y+" distance from goal is "+currentNode.getDistanceFromGoal()+" distance from start is "+currentNode.getDistanceFromStart());
 				// queue.addAll(getNeighborEdgesByPoint(currentNode));
 				for (MapEdge edge : getNeighborEdgesByPoint(currentNode)) {
 					MapNode next = edge.getNodeTo();
@@ -395,20 +419,35 @@ public class MapGraph {
 
 		MapGraph simpleTestMap = new MapGraph();
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap);
-
+//
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
-
-		System.out.println("start aStar search");
+		
+		MapGraph simpleTestMap2 = new MapGraph();
+		GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap2);
+//
+		GeographicPoint testStart2 = new GeographicPoint(1.0, 1.0);
+		GeographicPoint testEnd2 = new GeographicPoint(8.0, -1.0);
+//
+//		System.out.println("start aStar search");
 		// List<GeographicPoint> testroute0 = simpleTestMap.bfs(testStart,
 		// testEnd);
 		// System.out.println(testroute0);
-		// List<GeographicPoint> testroute1 = simpleTestMap.dijkstra(testStart,
-		// testEnd);
-		// System.out.println(testroute1);
-		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart, testEnd);
+		 List<GeographicPoint> testroute1 = simpleTestMap.dijkstra(testStart,
+		 testEnd);
+		 System.out.println(testroute1);
+		List<GeographicPoint> testroute2 = simpleTestMap2.aStarSearch(testStart2, testEnd2);
 		System.out.println(testroute2);
-
+//		MapGraph theMap = new MapGraph();
+//		System.out.print("DONE. \nLoading the map...");
+//		GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
+//		System.out.println("DONE.");
+//
+//		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
+//		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
+//
+//	//	List<GeographicPoint> route = theMap.dijkstra(start,end);
+//		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
 		// MapGraph testMap = new MapGraph();
 		// GraphLoader.loadRoadMap("data/maps/utc.map", testMap);
 		//

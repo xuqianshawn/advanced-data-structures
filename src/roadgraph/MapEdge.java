@@ -5,7 +5,8 @@ public class MapEdge {
 	private final MapNode _to;
 	private final String _roadName;
 	private final String _roadType;
-	//private final double _maxSpeed;
+	//default value of maxSpeed
+	private double _maxSpeed=60;
 	private final double _length;
 	public MapEdge(MapNode from, MapNode to, String roadName, String roadType, double length) {
 		_from = from;
@@ -27,10 +28,14 @@ public class MapEdge {
 	{
 		return _roadType;
 	}
-//	public double getMaxSpeed()
-//	{
-//		return _maxSpeed;
-//	}
+	public double getMaxSpeed()
+	{
+		return _maxSpeed;
+	}
+	public void setMaxSpeed(double val)
+	{
+		_maxSpeed=val;
+	}
 	public double getLength()
 	{
 		return _length;
